@@ -1,0 +1,69 @@
+﻿@model BugTracker.Shared.Dtos.BugCreateOrUpdateDto
+
+@{
+    ViewData["Title"] = "Create";
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<h1>Create</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" enctype="multipart/form-data" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="TicketNumber" class="control-label"></label>
+                <input asp-for="TicketNumber" class="form-control" />
+                <span asp-validation-for="TicketNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Severity" class="control-label"></label>
+                <select asp-for="Severity" asp-items="Html.GetEnumSelectList<BugTracker.Shared.Enum.Severity>()" class="form-control"></select>
+                <span asp-validation-for="Severity" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Status" class="control-label"></label>
+                <select asp-for="Status" asp-items="Html.GetEnumSelectList<BugTracker.Shared.Enum.Status>()" class="form-control"></select>
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ReproductionStep" class="control-label"></label>
+                <input asp-for="ReproductionStep" class="form-control" />
+                <span asp-validation-for="ReproductionStep" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FileAttachments" class="control-label"></label>
+                <input asp-for="FileAttachments" class="form-control" type="file" multiple name="FileAttachments" />
+                <span asp-validation-for="FileAttachments" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <input type="submit" value="Create" class="btn btn-primary" />
+                <a class="btn btn-dark" asp-action="Index">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>

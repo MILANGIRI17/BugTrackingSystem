@@ -1,0 +1,48 @@
+﻿@model UserRegisterDto
+@using BugTracker.Shared.Dtos
+@{
+    ViewData["Title"] = "Register User";
+    Layout = "_Layout";
+}
+@if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+{
+    <div class="row m-b-20">
+        <div class="col-md-12">
+            <h6 class="text-danger text-center">@ViewBag.ErrorMessage</h6>
+        </div>
+    </div>
+}
+
+<div class="container mt-5" style="width:30%">
+    <h2 class="mb-4">Register</h2>
+    <form asp-action="Register" method="post" asp-antiforgery="true">
+        <div class="form-group mb-3">
+            <label for="username">Username</label>
+            <input type="text" class="form-control" asp-for="UserName" placeholder="Enter user name" name="Username" required>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="exampleInputEmail1">Email address</label>
+            <input type="email" class="form-control" asp-for="Email" aria-describedby="emailHelp" placeholder="Enter email" name="Email" required>
+        </div>
+
+        <div class="form-group mb-3 position-relative">
+            <label for="exampleInputPassword1">Password</label>
+            <input type="password" class="form-control" asp-for="Password" placeholder="Password" name="Password" required>
+        </div>
+
+        <div class="form-group mb-3 position-relative">
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" class="form-control" asp-for="ConfirmPassword" placeholder="Confirm Password" name="ConfirmPassword" required>
+        </div>
+
+        <div class="form-check mb-3">
+            <input asp-for="IsDeveloper" type="checkbox" class="form-check-input" name="IsDeveloper">
+            <label class="form-check-label" asp-for="IsDeveloper">As Developer</label>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">Register</button>
+            <a asp-controller="Account" asp-action="Login" class="btn btn-link">Back to Login</a>
+        </div>
+    </form>
+</div>

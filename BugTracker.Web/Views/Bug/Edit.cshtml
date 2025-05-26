@@ -1,0 +1,74 @@
+﻿@model BugTracker.Shared.Dtos.BugCreateOrUpdateDto
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" enctype="multipart/form-data" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input name="id" type="hidden" value="@Model.Id"/>
+            <div class="form-group">
+                <label asp-for="TicketNumber" class="control-label"></label>
+                <input asp-for="TicketNumber" class="form-control" readonly />
+                <span asp-validation-for="TicketNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" readonly />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" readonly />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Severity" class="control-label"></label>
+                <input asp-for="Severity"class="form-control" readonly/>
+                <span asp-validation-for="Severity" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Status" class="control-label"></label>
+                <select asp-for="Status" asp-items="Html.GetEnumSelectList<BugTracker.Shared.Enum.Status>()" class="form-control"></select>
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ReproductionStep" class="control-label"></label>
+                <input asp-for="ReproductionStep" class="form-control" readonly />
+                <span asp-validation-for="ReproductionStep" class="text-danger"></span>
+           </div>
+            <div class="form-group">
+                <label asp-for="Assignee" class="control-label"></label>
+                <input asp-for="Assignee" class="form-control" readonly/>
+                <span asp-validation-for="Assignee" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Attachments:</label>
+                <div>
+                    @if (Model.Attachments != null && Model.Attachments.Any())
+                    {
+                        foreach (var filePath in Model.Attachments)
+                        {
+                            <div>
+                                <img src="~/@filePath.Name" alt="Attachment" style="max-width: 200px; max-height: 200px;" />
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p>No attachments available.</p>
+                    }
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+                <a class="btn btn-dark" asp-action="Index">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>
