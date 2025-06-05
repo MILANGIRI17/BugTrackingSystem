@@ -4,6 +4,7 @@ using BugTracker.Shared.Helper;
 using BugTracker.Shared.Pagination;
 using BugTracker.Web.Helper;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -91,17 +92,16 @@ namespace BugTracker.Web.Controllers
                 }
                 bugReportDto.FileAttachments = null; // Clear the file attachments after uploading
                 if (bugReportDto.Id == null) bugReportDto.Id = Guid.NewGuid().ToString();
-                var response = await _httpClient.PostAsJsonAsync("bug/add-bug", bugReportDto);
-                if (response.IsSuccessStatusCode)
+                var httpMessageResponse = await _httpClient.PostAsJsonAsync("bug/add-bug", bugReportDto);
+                var resposeContent = await httpMessageResponse.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<ResponseHandler<string>>(resposeContent);
+                if (result != null && result.IsSuccess)
                 {
-                    TempData["SuccessMessage"] = "Bug report has been added successfully.";
+                    TempData["SuccessMessage"] = result.Message;
                     return RedirectToAction("Index", "Bug");
                 }
-                else
-                {
-                    TempData["ErrorMessage"] = "An error occurred while creating the bug report.";
-                    return View(bugReportDto);
-                }
+                TempData["ErrorMessage"] = result?.Message ?? "Something went wrong";
+                return View(bugReportDto);
             }
             catch
             {
@@ -172,18 +172,16 @@ namespace BugTracker.Web.Controllers
                     bugReportDto.Attachments = attachments;
                 }
                 bugReportDto.FileAttachments = null; // Clear the file attachments after uploading
-                var response = await _httpClient.PutAsJsonAsync($"bug/update-bug/{id}", bugReportDto);
-                if (response.IsSuccessStatusCode)
+                var httpMessageResponse = await _httpClient.PutAsJsonAsync($"bug/update-bug/{id}", bugReportDto);
+                var resposeContent = await httpMessageResponse.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<ResponseHandler<string>>(resposeContent);
+                if (result != null && result.IsSuccess)
                 {
-                    TempData["SuccessMessage"] = "Bug report has been updated successfully.";
+                    TempData["SuccessMessage"] = result.Message;
                     return RedirectToAction("Index", "Bug");
                 }
-                else
-                {
-                    // Handle the error response here (you may want to log it or return an error message)
-                    ModelState.AddModelError(string.Empty, "An error occurred while updating the bug report.");
-                    return View(bugReportDto); // Return the view with the original model for corrections
-                }
+                TempData["ErrorMessage"] = result?.Message ?? "Something went wrong";
+                return View(bugReportDto); 
             }
             catch
             {
@@ -195,14 +193,16 @@ namespace BugTracker.Web.Controllers
         {
             var token = HttpContext.Session.GetString("AccessToken");
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            var response = await _httpClient.DeleteAsync($"bug/delete-bug/{id}");
-            if (response.IsSuccessStatusCode)
+            var httpMessageResponse = await _httpClient.DeleteAsync($"bug/delete-bug/{id}");
+            var resposeContent = await httpMessageResponse.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<ResponseHandler<string>>(resposeContent);
+            if (result != null && result.IsSuccess)
             {
-                TempData["SuccessMessage"] = "Bug report deleted successfully.";
+                TempData["SuccessMessage"] = result.Message;
                 return RedirectToAction("Index", "Bug");
             }
 
-            TempData["ErrorMessage"] = "An error occurred while deleting the bug report.";
+            TempData["ErrorMessage"] = result?.Message ?? "Something went wrong";
             return RedirectToAction("Index", "Bug");
         }
 

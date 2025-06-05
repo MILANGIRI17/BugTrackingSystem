@@ -80,16 +80,14 @@ namespace BugTracker.Web.Controllers
                         Content = content
                     };
                     var httpMessageResponse = await httpClient.SendAsync(request);
-                    if (httpMessageResponse.IsSuccessStatusCode)
+                    var resposeContent = await httpMessageResponse.Content.ReadAsStringAsync();
+                    var result = JsonConvert.DeserializeObject<ResponseHandler<string>>(resposeContent);
+                    if (result != null && result.IsSuccess)
                     {
                         return RedirectToAction("Login", "Account");
                     }
-                    else
-                    {
-                        var readContent = await httpMessageResponse.Content.ReadAsStringAsync();
-                        ViewData["ErrorMessage"] = readContent;
-                        return View();
-                    }
+                    ViewData["ErrorMessage"] = result?.Message ?? "Something went wrong";
+                    return View();
                 }
             }
             catch (Exception ex)

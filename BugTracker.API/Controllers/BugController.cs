@@ -1,4 +1,5 @@
-﻿using BugTracker.Application.Logger;
+﻿using BugTracker.API.Helper;
+using BugTracker.Application.Logger;
 using BugTracker.Application.Repositories;
 using BugTracker.Application.Services;
 using BugTracker.Domain.Entities;
@@ -106,6 +107,7 @@ namespace BugTracker.API.Controllers
         {
             try
             {
+                if(!ModelState.IsValid) return BadRequest(ResponseHandler<string>.FailureResopnse(ErrorMessageHelper.GetErrorMessage(ModelState)));
                 var bug = bugReportDto.Adapt<Bug>();
                 if (bugReportDto.Attachments != null && bugReportDto.Attachments.Count > 0)
                 {
@@ -122,7 +124,7 @@ namespace BugTracker.API.Controllers
                 }
                 await _uow.Repo<Bug>().AddAsync(bug);
                 await _uow.Commit();
-                return Ok(ResponseHandler<string>.SuccessResopnse("Bug Created Successfully"));
+                return Ok(ResponseHandler<string>.SuccessResopnse(message:"Bug Created Successfully"));
             }
             catch (Exception ex)
             {
@@ -137,19 +139,12 @@ namespace BugTracker.API.Controllers
         {
             try
             {
+                if(!ModelState.IsValid) return BadRequest(ResponseHandler<string>.FailureResopnse(ErrorMessageHelper.GetErrorMessage(ModelState)));
                 var bug = await _uow.Repo<Bug>().GetByIdAsync(id);
                 if (bug == null) return BadRequest(ResponseHandler<string>.FailureResopnse("Bug Not Found"));
-                //bug.TicketNumber = bugReportDto.TicketNumber;
-                //bug.Title = bugReportDto.Title;
-                //bug.Description = bugReportDto.Description;
-                //bug.ReproductionStep = bugReportDto.ReproductionStep;
-                //bug.Status = bugReportDto.Status;
-                //bug.Severity = bugReportDto.Severity;
-                //bug.AssignToUserId = bugReportDto.AssignToUserId;
-                //await _uow.Repo<Bug>().UpdateAsync(bug);
                 bugDto.Adapt(bug);
                 await _uow.Commit();
-                return Ok((ResponseHandler<string>.SuccessResopnse("Bug Updated Successfully")));
+                return Ok((ResponseHandler<string>.SuccessResopnse(message:"Bug Updated Successfully")));
             }
             catch (Exception ex)
             {
@@ -168,7 +163,7 @@ namespace BugTracker.API.Controllers
                 if (bug == null) return BadRequest(ResponseHandler<string>.FailureResopnse("Bug Not Found"));
                 await _uow.Repo<Bug>().DeleteAsync(bug);
                 await _uow.Commit();
-                return Ok((ResponseHandler<string>.SuccessResopnse("Bug Updated Successfully")));
+                return Ok((ResponseHandler<string>.SuccessResopnse(message: "Bug Deleted Successfully")));
             }
             catch (Exception ex)
             {

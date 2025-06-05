@@ -1,4 +1,5 @@
-﻿using BugTracker.Infrastructure.Identity;
+﻿using BugTracker.API.Helper;
+using BugTracker.Infrastructure.Identity;
 using BugTracker.Shared.Constants;
 using BugTracker.Shared.Dtos;
 using BugTracker.Shared.Helper;
@@ -6,7 +7,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq.Dynamic.Core.Tokenizer;
 using System.Security.Claims;
 using System.Text;
 
@@ -32,20 +32,20 @@ namespace BugTracker.API.Controllers
         {
             try
             {
-                if (!ModelState.IsValid) return BadRequest(ResponseHandler<string>.FailureResopnse("Invalid information provided"));
+                if (!ModelState.IsValid)return BadRequest(ResponseHandler<string>.FailureResopnse(ErrorMessageHelper.GetErrorMessage(ModelState)));
 
                 var user = await _userManager.FindByEmailAsync(request.Email);
                 if (user != null) return Ok(ResponseHandler<string>.FailureResopnse("User already exist with provided email address"));
 
                 User authUser = new User().CreateUser(request);
                 var authUserResponse = await _userManager.CreateAsync(authUser, request.Password);
-                if (!authUserResponse.Succeeded) return Ok(ResponseHandler<string>.FailureResopnse("registration failed."));
+                if (!authUserResponse.Succeeded) return Ok(ResponseHandler<string>.FailureResopnse(ErrorMessageHelper.GetErrorMessage(authUserResponse)));
 
                 var addRoleResponse = await _userManager.AddToRoleAsync(authUser, request.IsDeveloper ? DefaultUserRole.Developer : DefaultUserRole.User);
                 if (!addRoleResponse.Succeeded)
                 {
                     await _userManager.DeleteAsync(authUser);
-                    return Ok(ResponseHandler<string>.FailureResopnse("registration failed."));
+                    return Ok(ResponseHandler<string>.FailureResopnse(ErrorMessageHelper.GetErrorMessage(addRoleResponse)));
                 }
 
                 return Ok(ResponseHandler<string>.SuccessResopnse("User has been registered succefully."));
@@ -61,13 +61,13 @@ namespace BugTracker.API.Controllers
         {
             try
             {
-                if (!ModelState.IsValid) return BadRequest(ResponseHandler<string>.FailureResopnse("Invalid information provided"));
+                if (!ModelState.IsValid) return BadRequest(ResponseHandler<string>.FailureResopnse(ErrorMessageHelper.GetErrorMessage(ModelState)));
 
                 var user = await _userManager.FindByEmailAsync(request.Email);
-                if (user == null) return Ok(ResponseHandler<string>.SuccessResopnse("user not found"));
+                if (user == null) return BadRequest(ResponseHandler<string>.FailureResopnse("User not found"));
 
                 var signInResult = await _signManager.CheckPasswordSignInAsync(user, request.Password, true);
-                if (!signInResult.Succeeded) return Ok(ResponseHandler<string>.SuccessResopnse("password is not valid"));
+                if (!signInResult.Succeeded) return BadRequest(ResponseHandler<string>.FailureResopnse("Username and Password do not match."));
 
                 var claims = new List<Claim>
                 {

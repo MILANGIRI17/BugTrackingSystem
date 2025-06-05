@@ -2,6 +2,14 @@
     ViewData["Title"] = "Login";
     Layout = "_Layout";
 }
+@if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+{
+    <div class="row m-b-20">
+        <div class="col-md-12">
+            <h6 class="text-danger text-center">@Html.Raw(ViewBag.ErrorMessage)</h6>
+        </div>
+    </div>
+}
 <div class="container mt-5" style="width:30%">
     <h2 class="mb-4">Login</h2>
     <form asp-action="Login" asp-controller="Account" method="post" asp-antiforgery="true">

@@ -7,6 +7,7 @@ namespace BugTracker.Shared.Dtos
     public class BugCreateOrUpdateDto
     {
         public string? Id { get; set; }
+        
         [Required]
         public string? TicketNumber { get; set; }
 
