@@ -21,9 +21,9 @@ namespace BugTracker.Shared.Helper
                         if (!Directory.Exists(uploadDirectory))
                             Directory.CreateDirectory(uploadDirectory);
 
-                        var fileName = Path.GetFileName(file.FileName);
+                        var fileName = Path.GetFileNameWithoutExtension(file.FileName) + Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                         var filePath = Path.Combine(FileInformation.Location, fileName);
-                        var uploadPath = Path.Combine(uploadDirectory, file.FileName);
+                        var uploadPath = Path.Combine(uploadDirectory, fileName);
                         using (var stream = new FileStream(uploadPath, FileMode.Create))
                         {
                             await file.CopyToAsync(stream);

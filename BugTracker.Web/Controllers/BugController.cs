@@ -4,6 +4,7 @@ using BugTracker.Shared.Helper;
 using BugTracker.Shared.Pagination;
 using BugTracker.Web.Helper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
@@ -70,8 +71,17 @@ namespace BugTracker.Web.Controllers
             }
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> CreateAsync()
         {
+            var token = HttpContext.Session.GetString("AccessToken");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var getDeveloperResponse = await _httpClient.GetAsync("bug/get-developers");
+            if (getDeveloperResponse.IsSuccessStatusCode)
+            {
+                var developerResult = await getDeveloperResponse.Content.ReadFromJsonAsync<ResponseHandler<List<UserDto>>>();
+                ViewBag.Developers = new SelectList(developerResult?.Data ?? new List<UserDto>(),"Id", "UserName");
+            }
             return View();
         }
 
@@ -115,6 +125,7 @@ namespace BugTracker.Web.Controllers
         {
             var token = HttpContext.Session.GetString("AccessToken");
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            ViewData["Roles"] = GetRolesFromToken(token);
             var response = await _httpClient.GetAsync($"bug/get-bug/{id}");
             var userResponse = await _httpClient.GetAsync("bug/get-developers");
             List<UserDto> users = new List<UserDto>();

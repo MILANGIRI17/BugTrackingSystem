@@ -99,6 +99,7 @@ namespace BugTracker.API.Controllers
         public async Task<IActionResult> GetDevelopers()
         {
             var users = await _uow.Repo<User>().GetAllAsync(x => x.IsDeveloper);
+            users.Insert(0, new User { Id = "0", UserName = " " });
             return Ok(ResponseHandler<List<UserDto>>.SuccessResopnse(users.Adapt<List<UserDto>>()));
         }
 
@@ -109,19 +110,6 @@ namespace BugTracker.API.Controllers
             {
                 if(!ModelState.IsValid) return BadRequest(ResponseHandler<string>.FailureResopnse(ErrorMessageHelper.GetErrorMessage(ModelState)));
                 var bug = bugReportDto.Adapt<Bug>();
-                if (bugReportDto.Attachments != null && bugReportDto.Attachments.Count > 0)
-                {
-                    foreach (var attachment in bugReportDto.Attachments)
-                    {
-                        bug.Attachments.Add(new Attachment
-                        {
-                            BugId = bug.Id,
-                            Bug = bug,
-                            Name = attachment.Name,
-                            Path = attachment.Path
-                        });
-                    }
-                }
                 await _uow.Repo<Bug>().AddAsync(bug);
                 await _uow.Commit();
                 return Ok(ResponseHandler<string>.SuccessResopnse(message:"Bug Created Successfully"));

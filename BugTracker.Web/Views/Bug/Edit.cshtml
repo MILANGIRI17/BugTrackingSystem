@@ -1,6 +1,7 @@
 ﻿@model BugTracker.Shared.Dtos.BugCreateOrUpdateDto
 @{
     ViewData["Title"] = "Edit";
+    bool isDeveloper = ViewData["Roles"].ToString().Contains("Developer");
 }
 @if (TempData["SuccessMessage"] != null)
 {
@@ -25,48 +26,48 @@
             <input name="id" type="hidden" value="@Model.Id"/>
             <div class="form-group">
                 <label asp-for="TicketNumber" class="control-label"></label>
-                <input asp-for="TicketNumber" class="form-control" readonly />
+                <input asp-for="TicketNumber" class="form-control" readonly = "@(isDeveloper ? "readonly":null)"/>
                 <span asp-validation-for="TicketNumber" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" readonly />
+                <input asp-for="Title" class="form-control" readonly = "@(isDeveloper ? "readonly" : null)" />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" readonly />
+                <input asp-for="Description" class="form-control" readonly="@(isDeveloper ? "readonly" : null)" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Severity" class="control-label"></label>
-                <input asp-for="Severity"class="form-control" readonly/>
+                <select asp-for="Severity" asp-items="Html.GetEnumSelectList<BugTracker.Shared.Enum.Severity>()" class="form-control" disabled="@(isDeveloper ? "disabled" : null)"></select>
                 <span asp-validation-for="Severity" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Status" class="control-label"></label>
-                <select asp-for="Status" asp-items="Html.GetEnumSelectList<BugTracker.Shared.Enum.Status>()" class="form-control"></select>
+                <select asp-for="Status" asp-items="Html.GetEnumSelectList<BugTracker.Shared.Enum.Status>()" class="form-control" ></select>
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="ReproductionStep" class="control-label"></label>
-                <input asp-for="ReproductionStep" class="form-control" readonly />
+                <input asp-for="ReproductionStep" class="form-control" readonly="@(isDeveloper ? "readonly" : null)" />
                 <span asp-validation-for="ReproductionStep" class="text-danger"></span>
            </div>
             <div class="form-group">
                 <label asp-for="Assignee" class="control-label"></label>
-                <input asp-for="Assignee" class="form-control" readonly/>
+                <input asp-for="Assignee" class="form-control" readonly />
                 <span asp-validation-for="Assignee" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label>Attachments:</label>
-                <div>
+                <span>Attachments:</span>
+                <div class="row">
                     @if (Model.Attachments != null && Model.Attachments.Any())
                     {
                         foreach (var filePath in Model.Attachments)
                         {
-                            <div>
-                                <img src="~/@filePath.Name" alt="Attachment" style="max-width: 200px; max-height: 200px;" />
+                            <div class="col-md-5 p-2 m-1 border">
+                                <img src="~/@filePath.Name" alt="Attachment" style="max-width: 100%; max-height: 100%;"/>
                             </div>
                         }
                     }
